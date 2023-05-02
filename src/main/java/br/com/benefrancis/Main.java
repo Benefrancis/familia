@@ -3,13 +3,20 @@ package br.com.benefrancis;
 import br.com.benefrancis.model.PessoaFisica;
 import br.com.benefrancis.model.PessoaJuridica;
 import br.com.benefrancis.model.Sexo;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 import java.time.LocalDate;
 import java.util.Random;
 
 public class Main {
-
     public static void main(String[] args) {
+
+
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("oracle");
+        EntityManager manager = factory.createEntityManager();
+
 
         var bruno = new PessoaFisica();
         bruno.setCPF(geraCpf())
@@ -37,18 +44,15 @@ public class Main {
         var holding = new PessoaJuridica();
         holding.setCNPJ(geraCNPJ())
                 .setNascimento(LocalDate.now().minusYears(new Random().nextLong(99)))
-                .setNome("Benezinho");
+                .setNome("Benezinho Holding");
         holding.addSocio(bene).addSocio(bruno).addSocio(esposa);
 
 
         // Metodo para salvar aqui:
-
-
-
+        manager.getTransaction().begin();
+        manager.persist(holding);
+        manager.getTransaction().commit();
         //Métodos para consultar aqui:
-
-
-        System.out.println(bene);
 
         System.out.println(holding);
     }
@@ -68,5 +72,6 @@ public class Main {
         var cpf = String.valueOf(numero) + "/0001-" + String.valueOf(digito);
         return cpf;
     }
+
 
 }

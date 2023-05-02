@@ -2,7 +2,7 @@ package br.com.benefrancis.model;
 
 public enum Sexo {
 
-    MASCULINO(1, "Masculino", 'M'), FEMININO(2, "Feminino", 'F');
+    FEMININO(0, "Feminino", 'F'), MASCULINO(1, "Masculino", 'M');
 
     private int id;
     private String nome;
@@ -39,5 +39,10 @@ public enum Sexo {
     public Sexo setSigla(Character sigla) {
         this.sigla = sigla;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(sigla);
     }
 }

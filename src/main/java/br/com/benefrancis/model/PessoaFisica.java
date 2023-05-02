@@ -1,20 +1,58 @@
 package br.com.benefrancis.model;
 
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@Entity
+@Table(
+        name = "TB_PESSOA_FISICA",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UK_CPF", columnNames = "NR_CPF")
+        }
+)
+@DiscriminatorValue("PF")
 public class PessoaFisica extends Pessoa {
 
+    @Column(name = "NR_CPF")
     private String CPF;
 
+    @Enumerated(EnumType.STRING)
     private Sexo sexo;
 
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "TB_FILHOS",
+            joinColumns = {
+                    @JoinColumn(
+                            name = "ID_PAI",
+                            referencedColumnName = "ID_PESSOA",
+                            foreignKey = @ForeignKey(name = "FK_PAI")
+                    )
+            },
+                inverseJoinColumns = {
+                    @JoinColumn(
+                            name = "ID_FILHO",
+                            referencedColumnName = "ID_PESSOA",
+                            foreignKey = @ForeignKey(name = "FK_FILHO")
+                    )
+            }
+    )
     private Set<PessoaFisica> filhos = new LinkedHashSet<>(); //Os meus filhos
 
     public PessoaFisica() {
     }
 
+
+    public PessoaFisica(Long id, String nome, LocalDate nascimento, String CPF, Sexo sexo, Set<PessoaFisica> filhos) {
+        super(id, nome, nascimento);
+        this.CPF = CPF;
+        this.sexo = sexo;
+        this.filhos = filhos;
+    }
 
     /**
      * Método para adicionar um filho para a pessoa
@@ -77,13 +115,13 @@ public class PessoaFisica extends Pessoa {
 
     @Override
     public String toString() {
-        return "{" +
+        return "{ " +
                 "id=" + id +
                 ",  nome='" + nome + '\'' +
                 ",  nascimento=" + nascimento + '\'' +
                 ",  CPF='" + CPF + '\'' +
                 ",  sexo=" + sexo +
                 ",  filhos=" + filhos +
-                "} ";
+                " } ";
     }
 }
