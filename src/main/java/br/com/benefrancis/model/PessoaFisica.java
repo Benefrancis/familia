@@ -1,15 +1,39 @@
 package br.com.benefrancis.model;
 
+import jakarta.persistence.*;
+
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@Entity
+@Table(name = "TB_PESSOA_FISICA")
+@DiscriminatorValue("PF")
 public class PessoaFisica extends Pessoa {
 
+    @Column(name = "NR_CPF")
     private String CPF;
 
+    @Enumerated(EnumType.STRING)
     private Sexo sexo;
 
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "TB_FILHOS",
+            joinColumns = {
+                    @JoinColumn(
+                            name = "ID_PAI",
+                            referencedColumnName = "ID_PESSOA",
+                            foreignKey = @ForeignKey(name = "FK_PAI")
+                    )
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(
+                            name = "ID_FILHO",
+                            referencedColumnName = "ID_PESSOA",
+                            foreignKey = @ForeignKey(name = "FK_FILHO")
+                    )
+            }
+    )
     private Set<PessoaFisica> filhos = new LinkedHashSet<>(); //Os meus filhos
 
     public PessoaFisica() {
@@ -26,12 +50,9 @@ public class PessoaFisica extends Pessoa {
      * @return PessoaFisica
      */
     public PessoaFisica addFilho(PessoaFisica filho) {
-
         if (filho.equals(this)) throw new RuntimeException("Eu não posso ser ao mesmo tempo pai e filho");
-
         //Adiciono um filho meu
         this.filhos.add(filho);
-
         return this;
     }
 
@@ -77,13 +98,13 @@ public class PessoaFisica extends Pessoa {
 
     @Override
     public String toString() {
-        return "{" +
+        return "{ " +
                 "id=" + id +
                 ",  nome='" + nome + '\'' +
                 ",  nascimento=" + nascimento + '\'' +
                 ",  CPF='" + CPF + '\'' +
                 ",  sexo=" + sexo +
                 ",  filhos=" + filhos +
-                "} ";
+                " } ";
     }
 }
